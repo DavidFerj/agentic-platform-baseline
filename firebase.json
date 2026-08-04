@@ -1,0 +1,26 @@
+{
+  "firestore": {
+    "rules": "gcp/firebase/firestore.rules",
+    "indexes": "gcp/firebase/firestore.indexes.json"
+  },
+  "emulators": {
+    "apphosting": {
+      "rootDirectory": "frontend",
+      "startCommand": "pnpm run dev"
+    },
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9099
+    },
+    "firestore": {
+      "host": "127.0.0.1",
+      "port": 8080
+    },
+    "ui": {
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 4000
+    },
+    "singleProjectMode": true
+  }
+}

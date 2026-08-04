@@ -1,0 +1,43 @@
+schema_version: 1
+catalog_id: data-protection-foundation
+controls:
+  - id: DPF-CTRL-001
+    title: Processing inventory and classification
+    objective: Every processing activity declares purpose, data categories, classification, stores, and retention class.
+    evidence:
+      - docs/compliance/data-inventory.yaml
+  - id: DPF-CTRL-002
+    title: Trusted tenant and actor context
+    objective: Decisions use authenticated identity and server-resolved tenant membership rather than client claims.
+    evidence:
+      - gcp/services/control-plane/src/platform_api/domain/tenancy/entities.py
+  - id: DPF-CTRL-003
+    title: Purpose and authority limitation
+    objective: Processing is denied when declared purpose or recorded authority does not match the active policy.
+    evidence:
+      - gcp/services/control-plane/src/platform_api/domain/data_protection/engine.py
+  - id: DPF-CTRL-004
+    title: Data minimization and identifier handling
+    objective: Sensitive classifications produce enforceable minimization and redaction obligations.
+    evidence:
+      - gcp/packages/contracts/compliance/policy-decision.v1.schema.json
+  - id: DPF-CTRL-005
+    title: Versioned and reproducible decisions
+    objective: Every result identifies its policy version and carries a deterministic evidence fingerprint.
+    evidence:
+      - gcp/services/control-plane/tests/test_data_protection.py
+  - id: DPF-CTRL-006
+    title: Human authority for high-impact actions
+    objective: Configured consequential actions cannot proceed without an explicit approval obligation.
+    evidence:
+      - gcp/services/control-plane/src/platform_api/domain/data_protection/engine.py
+  - id: DPF-CTRL-007
+    title: Retention and audit obligations
+    objective: Every permitted or review-required decision requires retention enforcement and audit evidence.
+    evidence:
+      - docs/architecture/data-governance.md
+  - id: DPF-CTRL-008
+    title: Regulatory overlay governance
+    objective: Laws and certifications are activated only after applicability and legal review.
+    evidence:
+      - docs/compliance/applicability-matrix.yaml

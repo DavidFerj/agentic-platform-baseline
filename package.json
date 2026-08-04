@@ -1,0 +1,30 @@
+{
+  "name": "agentic-platform-baseline",
+  "private": true,
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @agentic-platform/web dev",
+    "lint": "pnpm --filter @agentic-platform/web lint",
+    "typecheck": "pnpm --filter @agentic-platform/web typecheck && pnpm --filter @agentic-platform/firebase typecheck",
+    "test": "pnpm --filter @agentic-platform/web test",
+    "test:coverage": "pnpm --filter @agentic-platform/web test:coverage",
+    "test:apphosting": "firebase emulators:exec --config firebase.json --only apphosting --project agentic-platform-local \"node scripts/check_apphosting.mjs\"",
+    "test:firebase": "firebase emulators:exec --config firebase.json --only firestore --project agentic-platform-local \"pnpm --filter @agentic-platform/firebase test\"",
+    "build": "pnpm --filter @agentic-platform/web build",
+    "emulators:firebase": "firebase emulators:start --config firebase.json --project agentic-platform-local",
+    "audit:dependencies": "pnpm audit --audit-level high",
+    "format:check": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "firebase-tools": "15.24.0",
+    "prettier": "3.6.2",
+    "turbo": "2.10.7"
+  }
+}

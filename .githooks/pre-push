@@ -1,0 +1,24 @@
+#!/bin/sh
+set -eu
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+if [ -x ".venv/Scripts/python.exe" ]; then
+  exec .venv/Scripts/python.exe -m scripts.validate_repository_hygiene
+fi
+if [ -x ".venv/bin/python" ]; then
+  exec .venv/bin/python -m scripts.validate_repository_hygiene
+fi
+if command -v uv >/dev/null 2>&1; then
+  exec uv run python -m scripts.validate_repository_hygiene
+fi
+if command -v python >/dev/null 2>&1; then
+  exec python -m scripts.validate_repository_hygiene
+fi
+if command -v python3 >/dev/null 2>&1; then
+  exec python3 -m scripts.validate_repository_hygiene
+fi
+
+echo "Security hook blocked the push: Python 3 or uv is required." >&2
+exit 1

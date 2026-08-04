@@ -1,0 +1,12 @@
+{
+  "project_name": "Agentic Platform Baseline",
+  "project_short_name": "APB",
+  "project_slug": "agentic-platform-baseline",
+  "python_package": "platform_api",
+  "python_distribution": "agentic-platform-control-plane",
+  "typescript_scope": "@agentic-platform",
+  "environment_prefix": "PLATFORM_",
+  "firebase_emulator_project": "agentic-platform-local",
+  "error_urn_namespace": "urn:agentic-platform",
+  "github_owner": "YOUR-GITHUB-HANDLE"
+}

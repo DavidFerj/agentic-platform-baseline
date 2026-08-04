@@ -1,0 +1,32 @@
+packages:
+  - "frontend"
+  - "gcp/firebase"
+  - "gcp/packages/*"
+
+overrides:
+  # Security floors for transitive tooling/runtime dependencies. The complete local and
+  # CI matrix validates compatibility; Dependabot removes floors once upstream catches up.
+  "@opentelemetry/core@<2.8.0": "2.8.0"
+  "brace-expansion@>=4.0.0 <5.0.9": "5.0.9"
+  "fast-uri@>=3.0.0 <3.1.5": "3.1.5"
+  "hono@<4.12.34": "4.12.34"
+  "minimatch@<10.2.6": "10.2.6"
+  "postcss@<8.5.18": "8.5.24"
+  "sharp@<0.35.0": "0.35.3"
+  "uuid@<11.1.1": "11.1.1"
+
+allowBuilds:
+  "@firebase/util": true
+  protobufjs: true
+  # Optional firebase-tools acceleration. Native compilation is unnecessary for
+  # the emulator workflows and would widen the install-time trust boundary.
+  re2: false
+  sharp: true
+  unrs-resolver: true
+
+peerDependencyRules:
+  allowedVersions:
+    # Upstream optional WASM bindings pin emnapi 1.x while declaring a 2.x alpha peer.
+    # The workspace uses native Windows/Linux bindings, so this exception cannot affect runtime.
+    "@emnapi/core": "1"
+    "@emnapi/runtime": "1"

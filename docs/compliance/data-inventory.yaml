@@ -1,0 +1,40 @@
+schema_version: 1
+inventory_id: platform-baseline-processing-activities
+classification_levels:
+  - public
+  - internal
+  - confidential
+  - restricted
+  - regulated_high_impact
+processing_activities:
+  - id: tenant-platform-operations
+    lifecycle: implemented_foundation
+    purpose: deliver_and_secure_multi_tenant_platform
+    data_categories:
+      - tenant_identifiers
+      - identity_references
+      - membership_roles
+      - audit_metadata
+    maximum_classification: confidential
+    systems:
+      - postgresql_system_of_record
+      - firestore_read_projection
+    retention_class: platform_operational_records
+    external_providers: []
+  - id: product-domain-records
+    lifecycle: extension_point_requires_project_definition
+    purpose: must_be_defined_by_derived_project
+    data_categories: []
+    maximum_classification: restricted
+    systems:
+      - postgresql_system_of_record
+    retention_class: must_be_defined_by_derived_project
+    external_providers: []
+  - id: agent-and-model-processing
+    lifecycle: deferred_agentops_mlops_extension
+    purpose: must_be_defined_before_activation
+    data_categories: []
+    maximum_classification: regulated_high_impact
+    systems: []
+    retention_class: must_be_defined_before_activation
+    external_providers: []

@@ -1,0 +1,19 @@
+# Default ownership
+* @YOUR-GITHUB-HANDLE
+
+# Security, delivery, persistence, and architecture boundaries
+/.github/ @YOUR-GITHUB-HANDLE
+/.dockerignore @YOUR-GITHUB-HANDLE
+/.gcloudignore @YOUR-GITHUB-HANDLE
+/.githooks/ @YOUR-GITHUB-HANDLE
+/.gitignore @YOUR-GITHUB-HANDLE
+/.env.example @YOUR-GITHUB-HANDLE
+/.firebaserc.example @YOUR-GITHUB-HANDLE
+/SECURITY.md @YOUR-GITHUB-HANDLE
+/docs/adrs/ @YOUR-GITHUB-HANDLE
+/docs/runbooks/secret-management.md @YOUR-GITHUB-HANDLE
+/gcp/infrastructure/ @YOUR-GITHUB-HANDLE
+/gcp/services/control-plane/migrations/ @YOUR-GITHUB-HANDLE
+/scripts/repository_hygiene.py @YOUR-GITHUB-HANDLE
+/scripts/validate_repository_hygiene.py @YOUR-GITHUB-HANDLE
+/specs/ @YOUR-GITHUB-HANDLE

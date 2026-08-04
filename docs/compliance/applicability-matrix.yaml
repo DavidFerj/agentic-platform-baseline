@@ -1,0 +1,38 @@
+schema_version: 1
+owner: derived-project-must-assign
+last_reviewed: "2026-08-04"
+disclaimer: Template entries are inactive references and do not establish legal compliance or certification.
+baseline_profiles:
+  - id: nist-csf-2.0
+    status: available_control_reference_not_activated
+    binding: false
+    review_required: during_project_adoption
+  - id: nist-privacy-framework-1.0
+    status: available_control_reference_not_activated
+    binding: false
+    review_required: during_project_adoption
+  - id: nist-ai-rmf-1.0
+    status: available_ai_governance_reference_not_activated
+    binding: false
+    review_required: before_agent_or_model_runtime
+legal_and_assurance_overlays:
+  - id: us-state-privacy-laws
+    status: derived_project_assessment_required
+    enforcement_enabled: false
+    approval: derived_project_legal_and_business_owner
+  - id: hipaa
+    status: derived_project_assessment_required
+    enforcement_enabled: false
+    approval: derived_project_legal_security_and_business_owner
+  - id: pci-dss
+    status: derived_project_assessment_required
+    enforcement_enabled: false
+    approval: derived_project_security_and_business_owner
+  - id: soc-2
+    status: optional_assurance_target_not_activated
+    enforcement_enabled: false
+    approval: derived_project_executive_security_and_auditor
+  - id: iso-27001-27701
+    status: optional_management_system_target_not_activated
+    enforcement_enabled: false
+    approval: derived_project_executive_security_privacy_and_certification_body

@@ -1,0 +1,6 @@
+.gcloudignore
+.git
+.gitignore
+
+# Keep Google Cloud source uploads aligned with the repository's denylist.
+#!include:.gitignore

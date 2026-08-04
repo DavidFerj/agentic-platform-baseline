@@ -1,0 +1,37 @@
+[tool.uv.workspace]
+members = ["gcp/services/control-plane"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["gcp/services/control-plane/src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "C4", "UP", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"gcp/services/control-plane/migrations/versions/*.py" = ["E501"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers --cov=platform_api --cov=scripts.repository_hygiene --cov-branch --cov-report=term-missing --cov-fail-under=100"
+testpaths = ["gcp/services/control-plane/tests", "scripts/tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["platform_api"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+skip_covered = true
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "if __name__ == .__main__.:",
+]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+mypy_path = ["gcp/services/control-plane/src"]
+packages = ["platform_api"]

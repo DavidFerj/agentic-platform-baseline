@@ -1,0 +1,163 @@
+openapi: 3.1.0
+info:
+  title: Agentic Platform Baseline
+  version: 0.1.0
+  description: Human-governed vertical-agnostic agentic delivery control plane.
+servers:
+  - url: http://localhost:8000
+    description: Local development
+tags:
+  - name: operations
+  - name: platform
+paths:
+  /health/live:
+    get:
+      operationId: getLiveness
+      summary: Confirm the API process can serve requests
+      tags: [operations]
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: Process is live
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/RequestId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              examples:
+                live:
+                  value:
+                    status: live
+                    dependencies: {}
+  /health/ready:
+    get:
+      operationId: getReadiness
+      summary: Confirm required dependencies are ready
+      tags: [operations]
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: Required dependencies are ready
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/RequestId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              examples:
+                ready:
+                  value:
+                    status: ready
+                    dependencies:
+                      database: ready
+        "503":
+          description: A required dependency is unavailable
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/RequestId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /api/v1/platform:
+    get:
+      operationId: getPlatformInformation
+      summary: Describe implemented foundation capability
+      tags: [platform]
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: Foundation information
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/RequestId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformInfo"
+components:
+  parameters:
+    RequestId:
+      name: X-Request-ID
+      in: header
+      required: false
+      description: Safe caller correlation identifier; invalid values are replaced.
+      schema:
+        type: string
+        maxLength: 128
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+  headers:
+    RequestId:
+      description: Correlation identifier for this request.
+      schema:
+        type: string
+  schemas:
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required: [status, dependencies]
+      properties:
+        status:
+          type: string
+          enum: [live, ready]
+        dependencies:
+          type: object
+          additionalProperties:
+            type: string
+            const: ready
+    PlatformInfo:
+      type: object
+      additionalProperties: false
+      required:
+        - product
+        - short_name
+        - version
+        - phase
+        - north_star
+        - implemented_capabilities
+        - deferred_capabilities
+      properties:
+        product:
+          type: string
+        short_name:
+          type: string
+        version:
+          type: string
+        phase:
+          type: string
+          const: foundation
+        north_star:
+          type: string
+        implemented_capabilities:
+          type: array
+          items:
+            type: string
+        deferred_capabilities:
+          type: array
+          items:
+            type: string
+    ProblemDetail:
+      type: object
+      additionalProperties: false
+      required: [type, title, status, detail, code, request_id]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        code:
+          type: string
+        request_id:
+          type: string

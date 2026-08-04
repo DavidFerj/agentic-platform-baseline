@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function belongsToIdentityTenant(tenantId) {
+      return request.auth != null
+        && request.auth.token.firebase.tenant == tenantId;
+    }
+
+    // Only deliberately sanitized, read-only projections may be consumed directly
+    // by the web client. Authoritative writes always go through a trusted backend.
+    match /tenants/{tenantId}/runProjections/{runId} {
+      allow read: if belongsToIdentityTenant(tenantId);
+      allow write: if false;
+    }
+
+    match /tenants/{tenantId}/projectProjections/{projectId} {
+      allow read: if belongsToIdentityTenant(tenantId);
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

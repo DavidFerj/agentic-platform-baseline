@@ -1,0 +1,176 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 11.9.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test:coverage
+      - run: pnpm build
+
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16.4-alpine
+        env:
+          POSTGRES_DB: platform_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d platform_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PLATFORM_ENVIRONMENT: test
+      PLATFORM_AUTH_MODE: development
+      PLATFORM_DATABASE_URL: "sqlite+aiosqlite:///:memory:"
+      PLATFORM_TEST_POSTGRES_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/platform_test"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: "0.8.3"
+          enable-cache: true
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --frozen --all-packages --all-extras
+      - run: uv run ruff format --check .
+      - run: uv run ruff check .
+      - run: >-
+          uv run mypy
+          gcp/services/control-plane/src
+          scripts/repository_hygiene.py
+          scripts/validate_repository_hygiene.py
+          scripts/install_repository_hooks.py
+      - run: uv run pytest
+      - run: uv run python scripts/validate_contracts.py
+      - run: uv run python scripts/validate_architecture.py
+      - run: uv run python -m scripts.validate_repository_hygiene
+
+  firebase:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 11.9.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @agentic-platform/firebase typecheck
+      - run: pnpm test:firebase
+      - run: pnpm test:apphosting
+
+  containers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      POSTGRES_DB: platform
+      POSTGRES_USER: platform_owner
+      POSTGRES_PASSWORD: ci-owner-non-production-password
+      POSTGRES_APP_USER: platform_runtime
+      POSTGRES_APP_PASSWORD: ci-runtime-non-production-password
+      REDIS_PASSWORD: ci-non-production-password
+      MINIO_ROOT_USER: platform-ci
+      MINIO_ROOT_PASSWORD: ci-non-production-password
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - run: docker compose config --quiet
+      - run: docker build --tag agentic-platform-control-plane:ci -f gcp/infrastructure/docker/control-plane.Dockerfile .
+      - run: docker build --tag agentic-platform-web:ci -f gcp/infrastructure/docker/frontend.Dockerfile .
+      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: agentic-platform-control-plane:ci
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: agentic-platform-web:ci
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: python3 -m scripts.validate_repository_hygiene
+      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
+        if: github.event_name == 'pull_request'
+        with:
+          fail-on-severity: high
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 11.9.0
+      - run: pnpm audit --audit-level high
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: "0.8.3"
+          enable-cache: true
+      - run: uv export --frozen --all-packages --all-extras --no-hashes --output-file "${RUNNER_TEMP}/platform-requirements.txt"
+      - run: uvx --from pip-audit==2.9.0 pip-audit --skip-editable --requirement "${RUNNER_TEMP}/platform-requirements.txt"
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"

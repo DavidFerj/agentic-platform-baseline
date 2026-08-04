@@ -31,3 +31,7 @@ exposure, durable evidence storage, consent and data-subject request workflows,
 retention/deletion execution, vendor assessments, breach notification, and continuous
 control monitoring are later verticals. Callers remain responsible for enforcing every
 returned obligation and recording the decision in the append-only audit boundary.
+
+Phase 3B begins that integration with trusted application context, exact server-side
+policy selection, and idempotent append-only decision evidence. Public policy routes
+remain disabled until Firebase/OIDC identity and tenant membership are verified.

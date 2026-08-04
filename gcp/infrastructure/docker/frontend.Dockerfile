@@ -1,4 +1,4 @@
-FROM node:24.14.0-bookworm-slim AS dependencies
+FROM node:26.5.1-bookworm-slim AS dependencies
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"

@@ -160,7 +160,15 @@ class AuditEvent(Base):
     """Append-only evidence for security and traceability."""
 
     __tablename__ = "audit_events"
-    __table_args__ = (Index("ix_audit_events_tenant_occurred", "tenant_id", "occurred_at"),)
+    __table_args__ = (
+        Index("ix_audit_events_tenant_occurred", "tenant_id", "occurred_at"),
+        UniqueConstraint(
+            "tenant_id",
+            "action",
+            "request_id",
+            name="uq_audit_event_tenant_action_request",
+        ),
+    )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     tenant_id: Mapped[UUID] = mapped_column(

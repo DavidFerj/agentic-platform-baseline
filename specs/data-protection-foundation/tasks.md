@@ -7,6 +7,6 @@
 - [x] DPF-TASK-005: document architectural decision and phase boundary.
 - [x] DPF-TASK-006: cover permit, deny, approval, consent, obligations, and fingerprint.
 - [x] DPF-TASK-007: connect new artifacts to architecture validation.
-- [ ] DPF-TASK-008: persist decisions through append-only audit integration (later phase).
+- [x] DPF-TASK-008: persist decisions through append-only audit integration (Phase 3B).
 - [ ] DPF-TASK-009: enforce obligations in authenticated workflows (later phase).
 - [ ] DPF-TASK-010: activate approved overlays after legal review (conditional future work).

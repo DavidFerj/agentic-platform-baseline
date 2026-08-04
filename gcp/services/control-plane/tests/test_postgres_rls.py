@@ -64,8 +64,8 @@ def test_rls_denies_missing_and_mismatched_tenant_context(
             )
             assert cursor.fetchall() == [
                 ("audit_events", True, True),
-                ("projects", True, True),
                 ("memberships", True, True),
+                ("projects", True, True),
                 ("workspaces", True, True),
             ]
 
